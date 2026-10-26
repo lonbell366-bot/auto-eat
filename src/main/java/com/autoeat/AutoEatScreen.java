@@ -13,14 +13,14 @@ public class AutoEatScreen extends Screen {
     private final AutoEatConfig config = AutoEatClient.config;
 
     public AutoEatScreen(Screen parent) {
-        super(Text.literal("Cai dat Auto Eat (DonutSMP)"));
+        super(Text.literal("Cai dat Auto Eat (DonutSMP Anti-Sus)"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
         int centerX = this.width / 2;
-        int startY = 32;
+        int startY = 24;
 
         this.addDrawableChild(new SliderWidget(centerX - 155, startY, 150, 20,
                 Text.literal("Nguong doi: <= " + config.hungerThreshold), (config.hungerThreshold - 1) / 18.0) {
@@ -47,9 +47,9 @@ public class AutoEatScreen extends Screen {
                     ? AutoEatConfig.SelectionMode.PREFERRED_SLOT : AutoEatConfig.SelectionMode.AUTO;
             button.setMessage(getSelectionModeText());
             config.save();
-        }).dimensions(centerX - 155, startY + 26, 150, 20).build());
+        }).dimensions(centerX - 155, startY + 24, 150, 20).build());
 
-        this.addDrawableChild(new SliderWidget(centerX + 5, startY + 26, 150, 20,
+        this.addDrawableChild(new SliderWidget(centerX + 5, startY + 24, 150, 20,
                 Text.literal("O uu tien: So " + (config.preferredSlot + 1)), config.preferredSlot / 8.0) {
             @Override
             protected void updateMessage() {
@@ -62,7 +62,7 @@ public class AutoEatScreen extends Screen {
             }
         });
 
-        this.addDrawableChild(new SliderWidget(centerX - 155, startY + 52, 150, 20,
+        this.addDrawableChild(new SliderWidget(centerX - 155, startY + 48, 150, 20,
                 Text.literal("Tre doi o: " + config.preEatDelay + " ticks"), config.preEatDelay / 10.0) {
             @Override
             protected void updateMessage() {
@@ -75,7 +75,7 @@ public class AutoEatScreen extends Screen {
             }
         });
 
-        this.addDrawableChild(new SliderWidget(centerX + 5, startY + 52, 150, 20,
+        this.addDrawableChild(new SliderWidget(centerX + 5, startY + 48, 150, 20,
                 Text.literal("Tre quay lai: " + config.postEatDelay + " ticks"), config.postEatDelay / 10.0) {
             @Override
             protected void updateMessage() {
@@ -93,39 +93,55 @@ public class AutoEatScreen extends Screen {
                     config.pauseInCombat = !config.pauseInCombat;
                     button.setMessage(Text.literal("Hoan khi PvP: " + (config.pauseInCombat ? "§aBAT" : "§cTAT")));
                     config.save();
-                }).dimensions(centerX - 155, startY + 78, 150, 20).build());
+                }).dimensions(centerX - 155, startY + 72, 150, 20).build());
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Hoan khi keo cung: " + (config.pauseWhenUsingItem ? "§aBAT" : "§cTAT")), button -> {
                     config.pauseWhenUsingItem = !config.pauseWhenUsingItem;
                     button.setMessage(Text.literal("Hoan khi keo cung: " + (config.pauseWhenUsingItem ? "§aBAT" : "§cTAT")));
                     config.save();
-                }).dimensions(centerX + 5, startY + 78, 150, 20).build());
+                }).dimensions(centerX + 5, startY + 72, 150, 20).build());
 
+        // 2 NUT MOI: NE FLAG DONUTSMP & RANDOM JITTER
+        this.addDrawableChild(ButtonWidget.builder(
+                Text.literal("Ne Flag GrimAC: " + (config.antiCheatBypass ? "§aBAT" : "§cTAT")), button -> {
+                    config.antiCheatBypass = !config.antiCheatBypass;
+                    button.setMessage(Text.literal("Ne Flag GrimAC: " + (config.antiCheatBypass ? "§aBAT" : "§cTAT")));
+                    config.save();
+                }).dimensions(centerX - 155, startY + 96, 150, 20).build());
+
+        this.addDrawableChild(ButtonWidget.builder(
+                Text.literal("Tre ngau nhien (Chong Sus): " + (config.humanJitter ? "§aBAT" : "§cTAT")), button -> {
+                    config.humanJitter = !config.humanJitter;
+                    button.setMessage(Text.literal("Tre ngau nhien (Chong Sus): " + (config.humanJitter ? "§aBAT" : "§cTAT")));
+                    config.save();
+                }).dimensions(centerX + 5, startY + 96, 150, 20).build());
+
+        // BO LOC DO AN
         this.addDrawableChild(ButtonWidget.builder(getFoodFilterText("Tao Vang", Items.GOLDEN_APPLE), button -> {
             config.toggleBlacklist(Items.GOLDEN_APPLE);
             config.toggleBlacklist(Items.ENCHANTED_GOLDEN_APPLE);
             button.setMessage(getFoodFilterText("Tao Vang", Items.GOLDEN_APPLE));
-        }).dimensions(centerX - 155, startY + 115, 150, 20).build());
+        }).dimensions(centerX - 155, startY + 132, 150, 20).build());
 
         this.addDrawableChild(ButtonWidget.builder(getFoodFilterText("Thit Thoi", Items.ROTTEN_FLESH), button -> {
             config.toggleBlacklist(Items.ROTTEN_FLESH);
             button.setMessage(getFoodFilterText("Thit Thoi", Items.ROTTEN_FLESH));
-        }).dimensions(centerX + 5, startY + 115, 150, 20).build());
+        }).dimensions(centerX + 5, startY + 132, 150, 20).build());
 
         this.addDrawableChild(ButtonWidget.builder(getFoodFilterText("Ca Noc & Mat Nhen", Items.PUFFERFISH), button -> {
             config.toggleBlacklist(Items.PUFFERFISH);
             config.toggleBlacklist(Items.SPIDER_EYE);
             button.setMessage(getFoodFilterText("Ca Noc & Mat Nhen", Items.PUFFERFISH));
-        }).dimensions(centerX - 155, startY + 141, 150, 20).build());
+        }).dimensions(centerX - 155, startY + 156, 150, 20).build());
 
         this.addDrawableChild(ButtonWidget.builder(getFoodFilterText("Qua Chorus", Items.CHORUS_FRUIT), button -> {
             config.toggleBlacklist(Items.CHORUS_FRUIT);
             button.setMessage(getFoodFilterText("Qua Chorus", Items.CHORUS_FRUIT));
-        }).dimensions(centerX + 5, startY + 141, 150, 20).build());
+        }).dimensions(centerX + 5, startY + 156, 150, 20).build());
 
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Luu & Dong"), button -> this.close())
-                .dimensions(centerX - 75, startY + 175, 150, 20).build());
+                .dimensions(centerX - 75, startY + 184, 150, 20).build());
     }
 
     private Text getPriorityText() {
@@ -144,8 +160,8 @@ public class AutoEatScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("§7--- Danh sach Cho phep / Chan do an ---"), this.width / 2, 134, 0xAAAAAA);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("§7--- Danh sach Cho phep / Chan do an ---"), this.width / 2, 144, 0xAAAAAA);
     }
 
     @Override
@@ -154,4 +170,4 @@ public class AutoEatScreen extends Screen {
             this.client.setScreen(this.parent);
         }
     }
-                                             }
+}
