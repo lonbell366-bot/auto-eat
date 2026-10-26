@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "autoeat",
+  "version": "${version}",
+  "name": "DonutSMP Auto Eat",
+  "description": "Auto Eat an toan cho DonutSMP 1.21.4",
+  "authors": ["lonbell366"],
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.autoeat.AutoEatClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
