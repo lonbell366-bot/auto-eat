@@ -26,11 +26,15 @@ public class AutoEatConfig {
 
     public PriorityMode priorityMode = PriorityMode.HIGHEST;
 
-    public int preEatDelay = 2;
-    public int postEatDelay = 3;
+    public int preEatDelay = 3;
+    public int postEatDelay = 4;
 
     public boolean pauseInCombat = true;
     public boolean pauseWhenUsingItem = true;
+
+    // Tinh nang Ne Flag & Chong Sus tren DonutSMP
+    public boolean antiCheatBypass = true; // Chong MultiTask, chong bam vao Ruong/Cua, dong bo packet
+    public boolean humanJitter = true;     // Cong them do tre ngau nhien nhu nguoi that
 
     public Set<String> blacklistedFoods = new HashSet<>();
 
