@@ -4,14 +4,14 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block. craftingTableBlock;
+import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.block.DoorBlock;
-import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.FenceGateBlock;
-import net.minecraft.block.AnvilBlock;
+import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -37,8 +37,8 @@ public class AutoEatClient implements ClientModInitializer {
     private int targetFoodSlot = -1;
     private boolean usingOffhand = false;
     private int delayTimer = 0;
-    private int eatSessionCooldown = 0; // Chong spam doi slot khi server lag
-    private int maxEatTicks = 0;        // Chong ket chuot phai khi TPS thap
+    private int eatSessionCooldown = 0;
+    private int maxEatTicks = 0;
     private int noFoodWarnCooldown = 0;
     private int combatCooldownTicks = 0;
 
@@ -95,7 +95,7 @@ public class AutoEatClient implements ClientModInitializer {
         if (eatSessionCooldown > 0) eatSessionCooldown--;
         if (player.hurtTime > 0) combatCooldownTicks = 60;
 
-        // Ngat ngay khi mo GUI
+        // Ngat ngay khi mo GUI (Tui do, Ruong, Chat...)
         if (client.currentScreen != null) {
             if (currentState != State.IDLE) {
                 resetState(client, true);
@@ -103,11 +103,12 @@ public class AutoEatClient implements ClientModInitializer {
             return;
         }
 
-        // ANTI-CHEAT: Neu nguoi choi bam giu chuot trai (dao khoi / danh) trong luc dang an -> Nha chuot phai ngay de tranh Flag MultiActions
+        // ANTI-CHEAT + VUA CHEM VUA AN:
+        // Khi ban bam chuot trai de chem/dao, tam nha chuot phai trong 1 tick do de khong bi GrimAC bat loi MultiActions,
+        // nhung khong huy chu trinh an de nhan vat tiep tuc an ngay khi vua vung kiem xong.
         if (config.antiCheatBypass && client.options.attackKey.isPressed()) {
-            if (currentState != State.IDLE) {
-                resetState(client, true);
-                eatSessionCooldown = 15; // Nghi 0.75s sau khi dao xong moi an lai
+            if (currentState == State.EATING) {
+                client.options.useKey.setPressed(false);
             }
             return;
         }
@@ -119,7 +120,7 @@ public class AutoEatClient implements ClientModInitializer {
                 currentState = State.IDLE;
                 savedSlot = -1;
                 targetFoodSlot = -1;
-                eatSessionCooldown = 20;
+                eatSessionCooldown = 10;
                 player.sendMessage(Text.literal("§e[AutoEat] §fDa huy tu dong an do ban tu doi o tay."), true);
                 return;
             }
@@ -144,12 +145,11 @@ public class AutoEatClient implements ClientModInitializer {
         if (config.pauseInCombat && combatCooldownTicks > 0) return;
         if (config.pauseWhenUsingItem && player.isUsingItem()) return;
 
-        // ANTI-CHEAT: Khong tu dong an khi dang chi tam ngam vao Ruong, Cua, Ban che tao...
         if (config.antiCheatBypass && isLookingAtInteractiveBlock(client)) {
             return;
         }
 
-        // 1. Kiem tra tay phu (Offhand) truoc: Neu tay phu co san do an hop le thi an luon khong can doi o
+        // Uu tien 1: Neu tay phu (Offhand) co san do an hop le thi an luon ma khong can doi o kiem tren tay chinh
         if (isValidFood(player.getOffHandStack())) {
             usingOffhand = true;
             savedSlot = player.getInventory().selectedSlot;
@@ -159,7 +159,7 @@ public class AutoEatClient implements ClientModInitializer {
             return;
         }
 
-        // 2. Tim trong 9 o Hotbar
+        // Uu tien 2: Quet 9 o Hotbar
         int bestSlot = findFoodSlot(player);
         if (bestSlot == -1) {
             if (noFoodWarnCooldown == 0) {
@@ -173,7 +173,6 @@ public class AutoEatClient implements ClientModInitializer {
         savedSlot = player.getInventory().selectedSlot;
         targetFoodSlot = bestSlot;
 
-        // Neu tay chinh dang cam san do an o o do roi thi khong can doi slot
         if (savedSlot != targetFoodSlot) {
             player.getInventory().selectedSlot = targetFoodSlot;
         }
@@ -188,7 +187,7 @@ public class AutoEatClient implements ClientModInitializer {
             return;
         }
         client.options.useKey.setPressed(true);
-        maxEatTicks = 120; // Gioi han an toi da 6 giay de tranh treo chuot khi lag mang
+        maxEatTicks = 120;
         currentState = State.EATING;
     }
 
@@ -219,15 +218,13 @@ public class AutoEatClient implements ClientModInitializer {
         if (!usingOffhand && savedSlot >= 0 && savedSlot < 9 && player.getInventory().selectedSlot != savedSlot) {
             player.getInventory().selectedSlot = savedSlot;
         }
-        // Dat thoi gian nghi ngau nhien (10 - 18 ticks) giua 2 chu ky de tranh bi GrimAC bat FastSwitch
-        eatSessionCooldown = config.humanJitter ? ThreadLocalRandom.current().nextInt(10, 19) : 8;
+        eatSessionCooldown = config.humanJitter ? ThreadLocalRandom.current().nextInt(8, 15) : 6;
         resetState(client, false);
     }
 
     private int getRandomizedDelay(int baseDelay) {
         if (!config.humanJitter) return baseDelay;
-        // Cong them ngau nhien tu 1 den 3 ticks de mo phong phan xa con nguoi
-        return baseDelay + ThreadLocalRandom.current().nextInt(1, 4);
+        return baseDelay + ThreadLocalRandom.current().nextInt(1, 3);
     }
 
     private boolean isLookingAtInteractiveBlock(MinecraftClient client) {
@@ -238,13 +235,12 @@ public class AutoEatClient implements ClientModInitializer {
         BlockState state = client.world.getBlockState(blockHit.getBlockPos());
         Block block = state.getBlock();
 
-        // Tranh bam chuot phai khi dang nhin vao Ruong, Shulker, Lo nung, Cua, Ban che tao, De...
         return block instanceof BlockWithEntity
                 || block instanceof DoorBlock
                 || block instanceof TrapdoorBlock
                 || block instanceof FenceGateBlock
                 || block instanceof AnvilBlock
-                || block instanceof net.minecraft.block.CraftingTableBlock;
+                || block instanceof CraftingTableBlock;
     }
 
     private void resetState(MinecraftClient client, boolean restoreSlot) {
@@ -301,4 +297,4 @@ public class AutoEatClient implements ClientModInitializer {
         if (!stack.contains(DataComponentTypes.FOOD)) return false;
         return !config.isBlacklisted(stack.getItem());
     }
-                }
+    }
