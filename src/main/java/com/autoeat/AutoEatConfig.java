@@ -15,26 +15,27 @@ import java.util.Set;
 
 public class AutoEatConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "autoeat.json");
+    // Doi sang autoeat_v2.json de tu dong lam moi cau hinh tren dien thoai cua ban
+    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "autoeat_v2.json");
 
     public boolean enabled = true;
-    public int hungerThreshold = 14;
+    public int hungerThreshold = 16; // Tu an khi <= 8 dui ga
     public int targetHunger = 20;
 
     public SelectionMode selectionMode = SelectionMode.AUTO;
-    public int preferredSlot = 8;
+    public int preferredSlot = 0;
 
     public PriorityMode priorityMode = PriorityMode.HIGHEST;
 
-    public int preEatDelay = 3;
-    public int postEatDelay = 4;
+    public int preEatDelay = 2;
+    public int postEatDelay = 3;
 
-    public boolean pauseInCombat = true;
+    // De false mac dinh de vua chem/bi danh/rut mau vi doi van tu dong an binh thuong
+    public boolean pauseInCombat = false;
     public boolean pauseWhenUsingItem = true;
 
-    // Tinh nang Ne Flag & Chong Sus tren DonutSMP
-    public boolean antiCheatBypass = true; // Chong MultiTask, chong bam vao Ruong/Cua, dong bo packet
-    public boolean humanJitter = true;     // Cong them do tre ngau nhien nhu nguoi that
+    public boolean antiCheatBypass = true;
+    public boolean humanJitter = true;
 
     public Set<String> blacklistedFoods = new HashSet<>();
 
@@ -42,14 +43,12 @@ public class AutoEatConfig {
     public enum PriorityMode { HIGHEST, LOWEST }
 
     public AutoEatConfig() {
-        blacklistedFoods.add("minecraft:golden_apple");
+        // Chi chan do doc nang & qua dich chuyen; cho phep Thit Thoi va Tao Vang de an o tram farm
         blacklistedFoods.add("minecraft:enchanted_golden_apple");
         blacklistedFoods.add("minecraft:chorus_fruit");
-        blacklistedFoods.add("minecraft:rotten_flesh");
         blacklistedFoods.add("minecraft:spider_eye");
         blacklistedFoods.add("minecraft:pufferfish");
         blacklistedFoods.add("minecraft:poisonous_potato");
-        blacklistedFoods.add("minecraft:suspicious_stew");
     }
 
     public boolean isBlacklisted(Item item) {
